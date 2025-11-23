@@ -2,33 +2,10 @@ package CORDIC
 
 import chisel3._
 import chisel3.util._
+import chiseltest._
+import chiseltest.formal._
 
-object CordicSimplifiedConstants {
-  val TRIG_CORDIC_K_DBL: Double = 0.6072529350088813 // Gain of CORDIC rotation/vectoring
-
-  /* Converts a Double to a BigInt representing a fixed-point number */
-  def doubleToFixed(x: Double, fractionalBits: Int, width: Int): BigInt = {
-    val scaled = BigDecimal(x) * BigDecimal(BigInt(1) << fractionalBits)
-    val rounded = scaled.setScale(0, BigDecimal.RoundingMode.HALF_UP).toBigInt
-    val maxVal = (BigInt(1) << (width - 1)) - 1
-    val minVal = -(BigInt(1) << (width - 1))
-    rounded.max(minVal).min(maxVal)
-  }
-
-  def getAtanLUT(fractionalBits: Int, width: Int, numEntries: Int): Seq[SInt] = {
-    (0 until numEntries).map { i =>
-      val angleRad = math.atan(math.pow(2.0, -i))
-      doubleToFixed(angleRad, fractionalBits, width).S(width.W)
-    }
-  }
-
-  // CORDIC operation modes
-  object Mode extends ChiselEnum {
-    val SinCos, ArctanMagnitude = Value
-  }
-}
-
-class CordicSimplified(val width: Int, val cycleCount: Int, val integerBits: Int = 3, val magnitudeCorrection: Boolean = true) extends Module {
+class CordicSimplifiedFormal(val width: Int, val cycleCount: Int, val integerBits: Int = 3, val magnitudeCorrection: Boolean = true) extends Module {
   import CordicSimplifiedConstants.Mode
   
   // Parameter Validations
@@ -165,8 +142,9 @@ class CordicSimplified(val width: Int, val cycleCount: Int, val integerBits: Int
         io.arctanOut := 0.S
         io.magnitudeOut := 0.S
       }
+      
+      assert(stable(io.arctanOut))
       state := s.idle
     }
   }
 }
-

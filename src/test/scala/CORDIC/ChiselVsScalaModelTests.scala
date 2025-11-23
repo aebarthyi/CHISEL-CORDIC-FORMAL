@@ -7,7 +7,7 @@ import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 import scala.math._
 
-class ChiselVsScalaModelTests extends AnyFlatSpec with ChiselScalatestTester with Matchers {
+class ChiselVsScalaModelTests extends AnyFlatSpec with ChiselScalatestTester with Matchers{
   val testWidth = 32
   val testCycles = 15
   val testIntegerBits = 3
