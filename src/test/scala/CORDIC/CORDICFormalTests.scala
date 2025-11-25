@@ -13,18 +13,18 @@ class CORDICFormalTests extends AnyFlatSpec with ChiselScalatestTester with Matc
   behavior of "FormalTrigCordic"
 
   it should "pass bounded formal check" in {
-    verify(new CordicSimplifiedFormal(32, 15, 3), Seq(BoundedCheck(10)))
+    verify(new CordicSimplifiedFormalHarness(32, 15, 3), Seq(BoundedCheck(10)))
   }
 
   behavior of "FormalLinearCordic"
 
   it should "pass bounded formal check" in {
-    verify(new LinearCordicFormal(32, 15, 3), Seq(BoundedCheck(10)))
+    verify(new LinearCordic(32, 15, 3), Seq(BoundedCheck(10)))
   }
 
   behavior of "FormalHyperCordic"
 
   it should "pass bounded formal check" in {
-    verify(new HyperCordicFormal(32, 15, 3), Seq(BoundedCheck(10)))
+    verify(new HyperCordic(32, 15, 3), Seq(BoundedCheck(10)))
   }
 }
