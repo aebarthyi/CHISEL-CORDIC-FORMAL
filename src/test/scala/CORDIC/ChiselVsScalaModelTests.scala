@@ -23,7 +23,7 @@ class ChiselVsScalaModelTests extends AnyFlatSpec with ChiselScalatestTester wit
 
   /**
     * Runs a single trigonometric CORDIC test, comparing Chisel DUT against a Scala model.
-    * @param dut The CordicSimplified instance (device under test).
+    * @param dut The CordicTrig instance (device under test).
     * @param model The TrigCordicModel instance (Scala model for reference).
     * @param mode The operation mode (SinCos or ArctanMagnitude).
     * @param angle The input angle for SinCos mode.
@@ -31,9 +31,9 @@ class ChiselVsScalaModelTests extends AnyFlatSpec with ChiselScalatestTester wit
     * @param yIn The input y-coordinate for ArctanMagnitude mode.
     */
   def runTrigTest(
-      dut: CordicSimplified,
+      dut: CordicTrig,
       model: TrigCordicModel,
-      mode: CordicSimplifiedConstants.Mode.Type,
+      mode: CordicTrigConstants.Mode.Type,
       angle: Double = 0.0,
       xIn: Double = 0.0,
       yIn: Double = 0.0
@@ -45,7 +45,7 @@ class ChiselVsScalaModelTests extends AnyFlatSpec with ChiselScalatestTester wit
     model.reset()
     model.setInputs(
       start = true,
-      modeIn = if (mode == CordicSimplifiedConstants.Mode.SinCos) CordicModelConstants.Mode.SinCos
+      modeIn = if (mode == CordicTrigConstants.Mode.SinCos) CordicModelConstants.Mode.SinCos
       else CordicModelConstants.Mode.ArctanMagnitude,
       theta = angleFixed,
       xIn = xFixed,
@@ -68,7 +68,7 @@ class ChiselVsScalaModelTests extends AnyFlatSpec with ChiselScalatestTester wit
     }
     dut.io.done.expect(true.B)
 
-    if (mode == CordicSimplifiedConstants.Mode.SinCos) {
+    if (mode == CordicTrigConstants.Mode.SinCos) {
       fixedToDouble(dut.io.cosOut.peek().litValue) should be(fixedToDouble(model.cos) +- tolerance)
       fixedToDouble(dut.io.sinOut.peek().litValue) should be(fixedToDouble(model.sin) +- tolerance)
     } else {
@@ -81,21 +81,21 @@ class ChiselVsScalaModelTests extends AnyFlatSpec with ChiselScalatestTester wit
   behavior of "TrigChiselVsScala"
 
   it should "calculate sin/cos correctly and match Scala model" in {
-    test(new CordicSimplified(testWidth, testCycles, testIntegerBits)) { dut =>
+    test(new CordicTrig(testWidth, testCycles, testIntegerBits)) { dut =>
       val model = new TrigCordicModel(testWidth, testCycles, testIntegerBits)
       val testAngles = Seq(0.0, Pi / 6, Pi / 4, Pi / 3, Pi / 2)
       for (angle <- testAngles) {
-        runTrigTest(dut, model, CordicSimplifiedConstants.Mode.SinCos, angle = angle)
+        runTrigTest(dut, model, CordicTrigConstants.Mode.SinCos, angle = angle)
       }
     }
   }
 
   it should "calculate arctan and magnitude correctly and match Scala model" in {
-    test(new CordicSimplified(testWidth, testCycles, testIntegerBits)) { dut =>
+    test(new CordicTrig(testWidth, testCycles, testIntegerBits)) { dut =>
       val model = new TrigCordicModel(testWidth, testCycles, testIntegerBits)
       val testCoords = Seq((1.0, 0.0), (1.0, 1.0), (1.0, 0.5))
       for ((x, y) <- testCoords) {
-        runTrigTest(dut, model, CordicSimplifiedConstants.Mode.ArctanMagnitude, xIn = x, yIn = y)
+        runTrigTest(dut, model, CordicTrigConstants.Mode.ArctanMagnitude, xIn = x, yIn = y)
       }
     }
   }
